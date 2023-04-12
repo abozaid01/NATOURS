@@ -10,17 +10,16 @@ const tours = JSON.parse(
 app.use(express.json()); //console.log(req.body)  => JSON(application/json)
 app.use(express.urlencoded({ extended: true })); //console.log(req.body)  => form-encode (name - value)
 
-//============== Get All tours ==============
-app.get('/api/v1/tours', (req, res) => {
+//helpers functions
+const getAllTours = (req, res) => {
     res.status(200).json({
         status: 'success',
         result: tours.length,
         data: { tours },
     });
-});
+};
 
-//============== Get specific tour ==============
-app.get('/api/v1/tours/:_id', (req, res) => {
+const getTour = (req, res) => {
     const id = req.params._id * 1; //string to number
     const tour = tours.find((el) => el._id === id);
     if (!tour)
@@ -30,10 +29,9 @@ app.get('/api/v1/tours/:_id', (req, res) => {
         status: 'success',
         data: { tour },
     });
-});
+};
 
-//============== Create new tour ==============
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
     console.log(req.body);
 
     const newId = tours[tours.length - 1]._id + 1;
@@ -55,12 +53,9 @@ app.post('/api/v1/tours', (req, res) => {
             });
         }
     );
-});
+};
 
-//============== Edit specific tour ==============
-//Put => edit enitre object
-//patch => edit specific proprites
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
     if (req.params._id * 1 > tours.length)
         return res.status(404).json({ status: 'fail', message: 'invalid id' });
 
@@ -69,10 +64,9 @@ app.patch('/api/v1/tours/:id', (req, res) => {
         status: 'success',
         data: '<updated tour ...>',
     });
-});
+};
 
-//============== Delete specific tour ==============
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
     if (req.params._id * 1 > tours.length)
         return res.status(404).json({ status: 'fail', message: 'invalid id' });
 
@@ -81,7 +75,20 @@ app.delete('/api/v1/tours/:id', (req, res) => {
         status: 'success',
         data: null,
     });
-});
+};
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:_id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:_id', updateTour);
+// app.delete('/api/v1/tours/:_id', deleteTour);
+
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+
+app.route('/api/v1/tours/:_id')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour);
 
 const port = 3000;
 app.listen(port, () => {
