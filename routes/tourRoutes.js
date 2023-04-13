@@ -4,10 +4,19 @@ const {
     createTour,
     updateTour,
     deleteTour,
+    checkId,
 } = require('../controllers/tourController');
 
 const express = require('express');
 const router = express.Router();
+
+//executed when a specific parameter[_id] is present in a route URL
+router.param('_id', (req, res, next, val) => {
+    console.log(`Tour id is: ${val}`);
+    next();
+});
+
+router.param('_id', checkId);
 
 router.route('/').get(getAllTours).post(createTour);
 

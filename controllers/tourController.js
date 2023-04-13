@@ -5,6 +5,17 @@ const tours = JSON.parse(
     )
 );
 
+exports.checkId = (req, res, next, val) => {
+    console.log(`Tour id is: ${val}`);
+
+    if (req.params._id * 1 > tours.length)
+        return res.status(404).json({
+            status: 'fail',
+            message: 'invalid id',
+        });
+    next();
+};
+
 exports.getAllTours = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -14,14 +25,8 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-    const id = req.params._id * 1; //string to number
+    const id = req.params._id * 1;
     const tour = tours.find((el) => el._id === id);
-    if (!tour)
-        return res.status(404).json({
-            status: 'fail',
-            message: 'invalid id',
-        });
-
     res.status(200).json({
         status: 'success',
         data: { tour },
@@ -53,12 +58,6 @@ exports.createTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-    if (req.params._id * 1 > tours.length)
-        return res.status(404).json({
-            status: 'fail',
-            message: 'invalid id',
-        });
-
     //Implement the logic of update ...
     res.status(200).json({
         status: 'success',
@@ -67,12 +66,6 @@ exports.updateTour = (req, res) => {
 };
 
 exports.deleteTour = (req, res) => {
-    if (req.params._id * 1 > tours.length)
-        return res.status(404).json({
-            status: 'fail',
-            message: 'invalid id',
-        });
-
     //Implement the logic of delete ...
     res.status(204).json({
         status: 'success',
