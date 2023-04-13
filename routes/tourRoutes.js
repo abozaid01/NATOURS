@@ -1,3 +1,4 @@
+const express = require('express');
 const {
     getAllTours,
     getTour,
@@ -8,7 +9,6 @@ const {
     checkBody,
 } = require('../controllers/tourController');
 
-const express = require('express');
 const router = express.Router();
 
 //executed when a specific parameter[_id] is present in a route URL

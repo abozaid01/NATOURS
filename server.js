@@ -1,7 +1,8 @@
 const dotenv = require('dotenv');
+const app = require('./app');
+
 dotenv.config({ path: `${__dirname}/.env` });
 
-const app = require('./app');
 console.log(app.get('env'));
 
 //Starting the server
