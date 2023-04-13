@@ -5,10 +5,13 @@ const express = require('express');
 const app = express();
 
 //middlewares
-app.use(express.json()); //console.log(req.body)  => JSON(application/json)
-app.use(express.urlencoded({ extended: true })); //console.log(req.body)  => form-encode (name - value)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/public`));
-app.use(morgan('dev')); //3rd party middlewares
+
+if (process.env.NODE_ENV === 'development')
+    app.use(morgan('dev'));
+
 app.use((req, res, next) => {
     console.log('hello from my own middleware👋');
     next();

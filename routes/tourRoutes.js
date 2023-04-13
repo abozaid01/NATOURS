@@ -13,7 +13,7 @@ const router = express.Router();
 
 //executed when a specific parameter[_id] is present in a route URL
 router.param('_id', (req, res, next, val) => {
-    console.log(`Tour id is: ${val}`);
+    //console.log(`Tour id is: ${val}`);
     next();
 });
 
