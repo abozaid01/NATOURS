@@ -7,6 +7,7 @@ const app = express();
 //middlewares
 app.use(express.json()); //console.log(req.body)  => JSON(application/json)
 app.use(express.urlencoded({ extended: true })); //console.log(req.body)  => form-encode (name - value)
+app.use(express.static(`${__dirname}/public`));
 app.use(morgan('dev')); //3rd party middlewares
 app.use((req, res, next) => {
     console.log('hello from my own middleware👋');
