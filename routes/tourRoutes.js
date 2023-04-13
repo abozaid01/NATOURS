@@ -5,6 +5,7 @@ const {
     updateTour,
     deleteTour,
     checkId,
+    checkBody,
 } = require('../controllers/tourController');
 
 const express = require('express');
@@ -18,7 +19,10 @@ router.param('_id', (req, res, next, val) => {
 
 router.param('_id', checkId);
 
-router.route('/').get(getAllTours).post(createTour);
+router
+    .route('/')
+    .get(getAllTours)
+    .post(checkBody, createTour);
 
 router
     .route('/:_id')
