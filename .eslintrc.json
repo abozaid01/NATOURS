@@ -18,6 +18,7 @@
         "no-underscore-dangle": "off",
         "class-methods-use-this": "off",
         "import/no-extraneous-dependencies": "off",
+        "node/no-unsupported-features/es-syntax": "off",
         "dot-notation": "warn",
         "prefer-destructuring": [
             "error",
