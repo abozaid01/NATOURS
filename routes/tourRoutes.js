@@ -6,6 +6,8 @@ const {
     createTour,
     updateTour,
     deleteTour,
+    getTourStat,
+    getMonthlyPlan,
 } = require('../controllers/tourController');
 
 const router = express.Router();
@@ -19,6 +21,9 @@ router.param('_id', (req, res, next, val) => {
 router
     .route('/top-5-tours')
     .get(aliasTopTours, getAllTours);
+
+router.route('/tour-stats').get(getTourStat);
+router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 router.route('/').get(getAllTours).post(createTour);
 
