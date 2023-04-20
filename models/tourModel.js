@@ -1,4 +1,5 @@
 const mongosse = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongosse.Schema(
     {
@@ -56,6 +57,10 @@ const tourSchema = new mongosse.Schema(
             select: false,
         },
         startDates: [Date],
+        secretTour: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         toJSON: { virtuals: true },
@@ -65,6 +70,49 @@ const tourSchema = new mongosse.Schema(
 
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
+});
+
+//================ Document Middlewares =======================
+//runs before .save() and create() but NOT insertMany()
+tourSchema.pre('save', function (next) {
+    //console.log(this);
+    this.name = slugify(this.name, { lower: true });
+    next();
+});
+
+tourSchema.pre('save', (next) => {
+    console.log('saving...');
+    next();
+});
+
+tourSchema.post('save', (doc, next) => {
+    console.log(doc);
+    next();
+});
+
+//================ Query Middlewares =======================
+// tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+    this.find({ secretTour: { $ne: true } });
+    this.start = Date.now();
+    next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+    console.log(
+        `this Query tooks ${
+            Date.now() - this.start
+        } milliseconds for execution`
+    );
+    next();
+});
+
+//================ Aggregation Middlewares =======================
+tourSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({
+        $match: { secretTour: { $ne: true } },
+    });
+    next();
 });
 
 const Tour = mongosse.model('Tour', tourSchema);
