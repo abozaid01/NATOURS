@@ -1,5 +1,6 @@
 const mongosse = require('mongoose');
 const slugify = require('slugify');
+// const validator = require('validator');
 
 const tourSchema = new mongosse.Schema(
     {
@@ -16,6 +17,10 @@ const tourSchema = new mongosse.Schema(
                 10,
                 'A tour name must be at most 10 characters',
             ],
+            // validate: [
+            //     validator.isAlpha,
+            //     'Tour name must only contain characters',
+            // ],
         },
         duration: {
             type: Number,
@@ -51,7 +56,20 @@ const tourSchema = new mongosse.Schema(
             type: Number,
             required: [true, 'A tour must have a price'],
         },
-        pricrDiscount: Number,
+        priceDiscount: {
+            type: Number,
+            validate: {
+                //"this" only points to current doc ON NEW document CREATION ONLY
+                // so it returns flase when update so won't update :(
+                //FIXME: fix update issue here
+                validator: function (value) {
+                    if (this.price !== undefined)
+                        return value < this.price;
+                },
+                message:
+                    'Discount price ({VALUE}) Must be below regular price',
+            },
+        },
         summary: {
             type: String,
             trim: true,
@@ -81,6 +99,7 @@ const tourSchema = new mongosse.Schema(
         },
     },
     {
+        // validateBeforeSave: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true },
     }
