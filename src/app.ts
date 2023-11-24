@@ -1,17 +1,14 @@
 import express from 'express';
-import apiRoutes from './routes/api';
+import tourRouter from './routes/tour.routes';
+import userRouter from './routes/user.routes';
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello, World!!!' });
-});
+// Middlewares
+app.use(express.json());
 
-app.use('/api/v1', apiRoutes);
+// Routes
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-const server = app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
-
-export default server;
+export default app;

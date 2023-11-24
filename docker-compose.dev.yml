@@ -10,7 +10,29 @@ services:
     volumes:
       - ./src:/app/src:ro
       - ./__tests__:/app/__tests__:ro
+      - ./dev-data:/app/dev-data
     environment:
       - NODE_ENV=devlopment
       - PORT=3000
+    env_file:
+      - ./.env
     command: ['npm', 'run', 'dev']
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo-db:/data/db
+    env_file:
+      - ./.env
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    env_file:
+      - ./.env
+
+volumes:
+  mongo-db:
