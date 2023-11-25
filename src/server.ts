@@ -2,7 +2,9 @@ import app from './app';
 import mongoose from 'mongoose';
 
 mongoose
-  .connect(process.env.ME_CONFIG_MONGODB_URL as string, { dbName: 'natours' })
+  .connect(process.env.ME_CONFIG_MONGODB_URL as string, {
+    dbName: process.env.DB_NAME as string,
+  })
   .then(() => {
     console.log('Connected to DB Successfully..');
   });

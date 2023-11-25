@@ -1,6 +1,6 @@
 version: '3'
 services:
-  express-app:
+  express-dev-app:
     image: 'natours-dev-img'
     build:
       context: .
@@ -15,24 +15,24 @@ services:
       - NODE_ENV=devlopment
       - PORT=3000
     env_file:
-      - ./.env
+      - ./dev.env
     command: ['npm', 'run', 'dev']
 
-  mongo:
+  mongo-dev:
     image: mongo
     restart: always
     volumes:
       - mongo-db:/data/db
     env_file:
-      - ./.env
+      - ./dev.env
 
-  mongo-express:
+  mongo-express-dev:
     image: mongo-express
     restart: always
     ports:
       - 8081:8081
     env_file:
-      - ./.env
+      - ./dev.env
 
 volumes:
   mongo-db:

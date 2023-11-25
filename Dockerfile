@@ -10,7 +10,15 @@ COPY . .
 RUN npm run build
 CMD ["npm", "run", "dev"]
 
-# Stage 3: Production stage
+# Stage 3: Testing Stage
+FROM base as testing
+WORKDIR /app
+COPY package* ./
+RUN npm i
+COPY . .
+CMD ["npm", "test"]
+
+# Stage 4 Production Stage
 FROM base as production
 
 WORKDIR /app
