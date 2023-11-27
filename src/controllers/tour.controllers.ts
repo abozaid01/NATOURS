@@ -1,9 +1,23 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import Tour from '../models/tour.models';
+import APIFeatures from '../utils/apiFeatures';
 
 export const getTours = async (req: Request, res: Response) => {
   try {
-    const tours = await Tour.find();
+    // Base QUERY
+    const query = Tour.find();
+
+    // Add more Features for Query
+    const features = new APIFeatures(query, req.query)
+      .filter()
+      .sort()
+      .project()
+      .paginate();
+
+    // EXECUTE QUERY
+    const tours = await features.queryExec;
+
+    // SEND RESPONSE
     res.json({
       status: 'success',
       results: tours.length,
@@ -19,9 +33,20 @@ export const getTours = async (req: Request, res: Response) => {
   }
 };
 
+export const aliasTopTours = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,difficulty,summary,ratingsAverage';
+  next();
+};
+
 export const getTour = async (req: Request, res: Response) => {
   try {
-    const foundTour = await Tour.findById(req.params.id);
+    const foundTour = await Tour.findById(req.params.id).select('-__v');
     res.json({
       status: 'success',
       data: {

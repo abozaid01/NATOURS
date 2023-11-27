@@ -4,6 +4,9 @@ import * as toursController from '../controllers/tour.controllers';
 const router = Router();
 
 router
+  .route('/top-5')
+  .get(toursController.aliasTopTours, toursController.getTours);
+router
   .route('/')
   .get(toursController.getTours)
   .post(toursController.createTour);
