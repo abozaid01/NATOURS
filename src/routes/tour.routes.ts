@@ -6,6 +6,8 @@ const router = Router();
 router
   .route('/top-5')
   .get(toursController.aliasTopTours, toursController.getTours);
+router.route('/stats').get(toursController.getStats);
+router.route('/busiest-month/:year').get(toursController.calculateBusiestMonth);
 router
   .route('/')
   .get(toursController.getTours)

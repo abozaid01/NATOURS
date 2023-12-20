@@ -112,3 +112,86 @@ export const deleteTour = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getStats = async (req: Request, res: Response) => {
+  try {
+    const stats = await Tour.aggregate([
+      // {
+      //   $match: { ratingsAverage: { $gte: 4.7 } },
+      // },
+      {
+        $group: {
+          _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRatings: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+
+// Calculate the busiest month of a given year (how many tours start in each month of the given year )
+export const calculateBusiestMonth = async (req: Request, res: Response) => {
+  try {
+    const year: number = Number(req.params.year);
+
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lt: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTours: { $sum: 1 },
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: {
+          month: '$_id',
+        },
+      },
+      {
+        $project: { _id: 0 },
+      },
+      {
+        $sort: { numTours: -1 },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      results: plan.length,
+      data: plan,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
