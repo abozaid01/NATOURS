@@ -12,7 +12,7 @@ services:
       - ./__tests__:/app/__tests__:ro
       - ./dev-data:/app/dev-data
     environment:
-      - NODE_ENV=devlopment
+      - NODE_ENV=development
       - PORT=3000
     env_file:
       - ./dev.env

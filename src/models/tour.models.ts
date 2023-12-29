@@ -1,5 +1,6 @@
 import { Schema, model, Query } from 'mongoose';
 import ITour from '../interfaces/tour.interface';
+import { logger } from '../utils/logger';
 // const validator = require('validator');
 
 // Extend the Mongoose Query interface with custom properties
@@ -125,9 +126,7 @@ tourSchma.pre<ITourQuery>(/^find/, function (next) {
 });
 
 tourSchma.post<ITourQuery>(/^find/, function (docs, next) {
-  console.log(
-    `this Query tooks ${Date.now() - this.start} milliseconds for execution`,
-  );
+  logger?.debug(`this Query tooks ${Date.now() - this.start} milliseconds for execution`);
   next();
 });
 

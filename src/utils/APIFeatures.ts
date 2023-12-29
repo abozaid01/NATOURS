@@ -25,10 +25,7 @@ class APIFeatures<T extends Document> {
 
     let queryStr: string;
     queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(
-      /\b(gte|gt|lte|lte)\b/g,
-      (match) => `$${match}`,
-    );
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lte)\b/g, (match) => `$${match}`);
 
     this.query.find(JSON.parse(queryStr));
     return this;
@@ -36,9 +33,7 @@ class APIFeatures<T extends Document> {
 
   sort() {
     if (this.reqQuery.sort) {
-      const sortBy: string = (this.reqQuery.sort as string)
-        .split(',')
-        .join(' ');
+      const sortBy: string = (this.reqQuery.sort as string).split(',').join(' ');
       this.query.sort(sortBy);
     } else this.query.sort('-createdAt');
     return this;
@@ -46,9 +41,7 @@ class APIFeatures<T extends Document> {
 
   project() {
     if (this.reqQuery.fields) {
-      const fields: string = (this.reqQuery.fields as string)
-        .split(',')
-        .join(' ');
+      const fields: string = (this.reqQuery.fields as string).split(',').join(' ');
       this.query.select(fields);
     } else this.query.select('-__v');
 
