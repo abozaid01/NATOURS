@@ -1,0 +1,31 @@
+version: '3'
+services:
+  express-test-app:
+    image: 'natours-test-img'
+    build:
+      context: .
+      target: testing
+    volumes:
+      - ./src:/app/src:ro
+      - ./__tests__:/app/__tests__:ro
+      - ./dev-data:/app/dev-data
+    environment:
+      - NODE_ENV=testing
+      - PORT=3333
+    env_file:
+      - ./test.env
+    command: ['npm', 'test']
+
+  mongo-test:
+    image: mongo
+    restart: always
+    env_file:
+      - ./test.env
+
+  mongo-express-test:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8090:8081
+    env_file:
+      - ./test.env
