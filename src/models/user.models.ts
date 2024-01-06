@@ -68,7 +68,7 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   // If 'password' has been modified, hash the password using bcrypt with a cost factor of 12
-  this.password = await bcrypt.hash(this.password, 12);
+  (this.password as string) = await bcrypt.hash(this.password as string, 12);
 
   // Avoid storing 'passwordConfirm' field in the DB to by setting its value to undefined
   this.passwordConfirm = undefined;

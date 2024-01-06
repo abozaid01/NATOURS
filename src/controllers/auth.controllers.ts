@@ -13,6 +13,30 @@ interface Request extends ExpressRequest {
   user?: IUser;
 }
 
+const createAndSendToken = (user: IUser, statusCode: number, res: Response) => {
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  res.cookie('jwt', token, {
+    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  // Remove password and __v properites from the output
+  user.password = undefined;
+  user.__v = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 export const signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -20,19 +44,9 @@ export const signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt,
   });
 
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 export const login = catchAsync(async (req, res, next) => {
@@ -43,19 +57,11 @@ export const login = catchAsync(async (req, res, next) => {
 
   // 2) check if user exist && pasword is correct in the DB
   const user = await User.findOne({ email }).select('+password');
-
-  if (!user || !(await user.comparePassword(password, user.password)))
+  if (!user || !(await user.comparePassword(password, user.password as string)))
     return next(new AppError('email or password incorrect', 401));
 
-  // 3) if everything is okay, sent the jwt
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRES_IN });
-
-  // 4) Send Resposne
-  res.status(200).json({
-    status: 'success',
-    token,
-    user,
-  });
+  // 3) if everything is okay, send the jwt
+  createAndSendToken(user, 200, res);
 });
 
 export const authenticate = catchAsync(async (req: Request, res, next) => {
@@ -161,15 +167,7 @@ export const resetPassword = catchAsync(async (req: Request, res: Response, next
   // Done in the pre('save') Middleware at the Model
 
   // 6) Log the user in, send JWT
-  const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  // Send Response
-  res.status(200).json({
-    status: 'success',
-    token: jwtToken,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 export const updatePassword = catchAsync(async (req: Request, res, next) => {
@@ -182,7 +180,7 @@ export const updatePassword = catchAsync(async (req: Request, res, next) => {
 
   // 2) Check if the current POSTed password is correct
   const currentPassword = req.body.currentPassword;
-  if (!(await user.comparePassword(currentPassword, user.password)))
+  if (!(await user.comparePassword(currentPassword, user.password as string)))
     return next(new AppError('current password incorrect', 401));
 
   // 3) Update the Password
@@ -191,12 +189,5 @@ export const updatePassword = catchAsync(async (req: Request, res, next) => {
   await user.save();
 
   // 4) Log User in, Send JWT
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRES_IN });
-
-  // Send Resposne
-  res.status(200).json({
-    status: 'success',
-    token,
-    user,
-  });
+  createAndSendToken(user, 200, res);
 });
