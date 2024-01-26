@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import * as toursController from '../controllers/tour.controllers';
 import * as authController from '../controllers/auth.controllers';
+import reviewRouter from './../routes/review.routes';
 
 const router = Router();
+
+router.use('/:tour_id/reviews', reviewRouter);
 
 router.route('/top-5').get(toursController.aliasTopTours, toursController.getTours);
 router.route('/stats').get(toursController.getStats);

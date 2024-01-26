@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 interface Tour {
   name: string;
   duration: number;
@@ -14,6 +16,8 @@ interface Tour {
   startDates: Date[];
   slug: string;
   secretTour: boolean;
+  guides: mongoose.Schema.Types.ObjectId;
+  locations: { description: string; type: 'Point'; day: number; coordinates: number[] }[];
 }
 
 export default Tour;

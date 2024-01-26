@@ -8,7 +8,7 @@ interface ITourQuery extends Query<ITour[] | ITour | null, ITour> {
   start: number;
 }
 
-const tourSchma = new Schema(
+const tourSchma = new Schema<ITour>(
   {
     name: {
       type: String,
@@ -76,24 +76,49 @@ const tourSchma = new Schema(
       required: [true, 'A tour must have a cover image'],
     },
     images: [String],
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-      select: false,
-    },
     startDates: [Date],
     secretTour: {
       type: Boolean,
       default: false,
     },
+    // Child Referencing
+    guides: [
+      {
+        type: Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    // Embedding Documents - Denormalized Dataset
+    locations: [
+      {
+        type: {
+          type: String, // Don't do `{ location: { type: String } }`
+          enum: ['Point'], // 'locations.type' must be 'Point'
+          required: true,
+        },
+        coordinates: {
+          type: [Number],
+          required: true,
+        },
+        description: String,
+        day: Number,
+      },
+    ],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
 
 //================ Add Virtual properties =======================
-tourSchma.virtual('durationWeeks').get(function () {
+tourSchma.virtual<ITour>('durationWeeks').get(function () {
   // 'this' refers to the document
   return this.duration / 7;
+});
+
+// Virtual Populate - Because of Parent Referncing on the Review Model, the Tour Model has no idea of its own Reviews
+tourSchma.virtual<ITour>('reviews', {
+  ref: 'Review',
+  foreignField: 'tour_id',
+  localField: '_id',
 });
 
 //================ Document Middlewares =======================
@@ -122,6 +147,11 @@ tourSchma.pre<ITourQuery>(/^find/, function (next) {
   // 'this' refers to the Query object, not the document
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSchma.pre<ITourQuery>(/^find/, function (next) {
+  this.populate({ path: 'guides', select: '-__v' });
   next();
 });
 

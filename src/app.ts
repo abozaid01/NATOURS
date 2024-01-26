@@ -1,6 +1,7 @@
 import express from 'express';
 import tourRouter from './routes/tour.routes';
 import userRouter from './routes/user.routes';
+import reviewRouter from './routes/review.routes';
 import AppError from './utils/AppError';
 import handleErrors from './middlewares/error.middleware';
 import httpLoggerMiddleware from './middlewares/logger.middleware';
@@ -46,6 +47,7 @@ app.use(httpLoggerMiddleware);
 // Routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //404 Not-Found Routes
 app.all('*', (req, res, next) => {
