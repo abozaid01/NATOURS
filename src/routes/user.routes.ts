@@ -11,10 +11,12 @@ router.route('/forget-password').post(authController.forgetPassword);
 router.route('/reset-password/:token').patch(authController.resetPassword);
 router.route('/update-password').patch(authController.authenticate, authController.updatePassword);
 
+router.route('/me').get(authController.authenticate, usersController.getMe, usersController.getUser);
 router.route('/update-me').patch(authController.authenticate, usersController.updateMe);
 router.route('/delete-me').delete(authController.authenticate, usersController.deleteMe);
 
-router.route('/').get(usersController.getUsers).post(usersController.createUser);
+router.use(authController.authenticate, authController.authorize('admin'));
+router.route('/').get(usersController.getUsers); //.post(usersController.createUser);
 router.route('/:id').get(usersController.getUser).patch(usersController.updateUser).delete(usersController.deleteUser);
 
 export default router;

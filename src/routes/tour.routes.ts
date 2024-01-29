@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as toursController from '../controllers/tour.controllers';
 import * as authController from '../controllers/auth.controllers';
-import reviewRouter from './../routes/review.routes';
+import reviewRouter from './review.routes';
 
 const router = Router();
 

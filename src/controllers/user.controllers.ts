@@ -3,52 +3,24 @@ import { catchAsync } from '../utils/catchAsync';
 import User from '../models/user.models';
 import AppError from '../utils/AppError';
 import IUser from '../interfaces/user.interface';
+import * as factory from '../utils/handleFactory';
 
 interface Request extends ExpressRequest {
   user?: IUser;
 }
 
-export const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await User.find().select('-__v');
-
-  res.json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
-
-export const getUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not Defined yet',
-  });
-};
-
-export const createUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not Defined yet',
-  });
-};
-
-export const updateUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not Defined yet',
-  });
-};
-
-export const deleteUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not Defined yet',
-  });
-};
+export const getUsers = factory.readAll(User);
+export const getUser = factory.readOne(User);
+// export const createUser = factory.createOne(User); // We already have Sign up Route
+export const updateUser = factory.updateOne(User); // NOTE: Don't update password with this; Because when using findByIdAndUpdate, all 'save' middlwares will not run
+export const deleteUser = factory.deleteOne(User);
 
 // =============== Manage My Own User Account ================ //
+
+export const getMe = (req: Request, res: Response, next: NextFunction) => {
+  req.params.id = req.user?.id as string;
+  next();
+};
 
 export const updateMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   // 1) Throw an Error if user want to update his Password

@@ -10,4 +10,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=80
+    env_file:
+      - ./prod.env
     command: ['npm', 'start']
+
+  mongo-dev:
+    image: mongo
+    restart: always
+    env_file:
+      - ./prod.env

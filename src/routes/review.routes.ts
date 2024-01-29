@@ -14,6 +14,17 @@ const router = Router({ mergeParams: true });
 router
   .route('/')
   .get(reviewsController.getReviews)
-  .post(authController.authenticate, authController.authorize('user'), reviewsController.createReview);
+  .post(
+    authController.authenticate,
+    authController.authorize('user'),
+    reviewsController.setTourReviewIds,
+    reviewsController.createReview,
+  );
+
+router
+  .route('/:id')
+  .get(reviewsController.getReview)
+  .patch(authController.authenticate, reviewsController.updateReview)
+  .delete(authController.authenticate, reviewsController.deleteReview);
 
 export default router;

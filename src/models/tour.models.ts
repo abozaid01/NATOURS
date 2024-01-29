@@ -1,6 +1,7 @@
 import { Schema, model, Query } from 'mongoose';
 import ITour from '../interfaces/tour.interface';
 import { logger } from '../utils/logger';
+import Review from './review.models';
 // const validator = require('validator');
 
 // Extend the Mongoose Query interface with custom properties
@@ -158,6 +159,16 @@ tourSchma.pre<ITourQuery>(/^find/, function (next) {
 tourSchma.post<ITourQuery>(/^find/, function (docs, next) {
   logger?.debug(`this Query tooks ${Date.now() - this.start} milliseconds for execution`);
   next();
+});
+
+tourSchma.pre<ITourQuery>('findOneAndDelete', async function (next) {
+  const tourId = this.getQuery()._id;
+  try {
+    await Review.deleteMany({ tour_id: tourId });
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
 });
 
 //================ Aggregation Middlewares =======================
