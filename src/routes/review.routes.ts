@@ -24,7 +24,17 @@ router
 router
   .route('/:id')
   .get(reviewsController.getReview)
-  .patch(authController.authenticate, reviewsController.updateReview)
-  .delete(authController.authenticate, reviewsController.deleteReview);
+  .patch(
+    authController.authenticate,
+    authController.authorize('user', 'admin'),
+    authController.authenticate,
+    reviewsController.updateReview,
+  )
+  .delete(
+    authController.authenticate,
+    authController.authorize('user', 'admin'),
+    authController.authenticate,
+    reviewsController.deleteReview,
+  );
 
 export default router;

@@ -9,9 +9,15 @@ interface Request extends ExpressRequest {
   user?: IUser;
 }
 
+export const createUser = (req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route is not defined! Please use /signup instead',
+  });
+};
+
 export const getUsers = factory.readAll(User);
 export const getUser = factory.readOne(User);
-// export const createUser = factory.createOne(User); // We already have Sign up Route
 export const updateUser = factory.updateOne(User); // NOTE: Don't update password with this; Because when using findByIdAndUpdate, all 'save' middlwares will not run
 export const deleteUser = factory.deleteOne(User);
 
