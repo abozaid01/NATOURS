@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import Tour from '../models/tour.models';
 import { catchAsync } from '../utils/catchAsync';
-import * as factory from '../utils/handleFactory';
+import Factory from '../utils/FactoryHandler';
 
-export const getTours = factory.readAll(Tour);
-export const getTour = factory.readOne(Tour, { path: 'reviews', select: '-__v' });
-export const createTour = factory.createOne(Tour);
-export const updateTour = factory.updateOne(Tour);
-export const deleteTour = factory.deleteOne(Tour);
+export const getTours = Factory.readAll(Tour);
+export const getTour = Factory.readOne(Tour, { path: 'reviews', select: '-__v' });
+export const createTour = Factory.createOne(Tour);
+export const updateTour = Factory.updateOne(Tour);
+export const deleteTour = Factory.deleteOne(Tour);
 
 export const aliasTopTours = (req: Request, res: Response, next: NextFunction) => {
   req.query.limit = '5';
