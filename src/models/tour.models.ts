@@ -110,6 +110,9 @@ const tourSchma = new Schema<ITour>(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
 
+//================ Indexes =======================
+tourSchma.index({ 'locations.coordinates': '2dsphere' }); // FIXME: Need to match locations.day = 1
+
 //================ Add Virtual properties =======================
 tourSchma.virtual<ITour>('durationWeeks').get(function () {
   // 'this' refers to the document
@@ -175,9 +178,15 @@ tourSchma.pre<ITourQuery>('findOneAndDelete', async function (next) {
 //================ Aggregation Middlewares =======================
 tourSchma.pre('aggregate', function (next) {
   // 'this' refers to the current Aggregation object
-  this.pipeline().unshift({
-    $match: { secretTour: { $ne: true } },
-  });
+  const pipeline = this.pipeline();
+
+  // Check if pipeline is empty or first stage is not $geoNear
+  if (!pipeline.length || !('$geoNear' in pipeline[0])) {
+    pipeline.unshift({
+      $match: { secretTour: { $ne: true } },
+    });
+  }
+
   next();
 });
 

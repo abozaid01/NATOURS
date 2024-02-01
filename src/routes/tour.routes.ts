@@ -20,5 +20,7 @@ router
 router.route('/top-5').get(toursController.aliasTopTours, toursController.getTours);
 router.route('/stats').get(toursController.getStats);
 router.route('/busiest-month/:year').get(toursController.calculateBusiestMonth);
+router.route('/tours-within/:distance/center/:latlang/unit/:unit').get(toursController.getToursWithin);
+router.route('/distances/:latlang/unit/:unit').get(toursController.getDistances);
 
 export default router;
