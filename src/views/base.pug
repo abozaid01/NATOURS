@@ -1,0 +1,26 @@
+doctype
+html(lang='en')
+  head
+    block head
+      meta(charset='utf-8')
+      meta(name='viewport' content='width=device-width, initial-scale=1.0')
+      link(rel='stylesheet', href='/css/style.css')
+      link(rel='shortcut icon', href='/img/favicon.png', type='image/x-icon')
+      link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+      title Natours | #{title}
+  
+  body
+
+    // HEADER
+    include _header
+
+    //- Inject Content HERE
+    block content 
+
+    // FOOTER
+    include _footer
+
+    if (process.env.NODE_ENV === 'development')
+      script(type="module" src="/js/src/index.js")
+    else
+      script(src="/js/bundle.js") 

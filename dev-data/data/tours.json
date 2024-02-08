@@ -20,7 +20,8 @@
         "description": "Lummus Park Beach",
         "type": "Point",
         "coordinates": [-80.128473, 25.781842],
-        "day": 1
+        "day": 1,
+        "region": "LA"
       },
       {
         "_id": "5c88fa8cf4afda39709c2958",
@@ -66,7 +67,8 @@
         "description": "Banff National Park",
         "type": "Point",
         "coordinates": [-116.214531, 51.417611],
-        "day": 1
+        "day": 1,
+        "region": "US, New York"
       },
       {
         "_id": "5c88fa8cf4afda39709c2953",
@@ -105,7 +107,8 @@
         "description": "Aspen Highlands",
         "type": "Point",
         "coordinates": [-106.855385, 39.182677],
-        "day": 1
+        "day": 1,
+        "region": "Cloud Nine"
       },
       {
         "_id": "5c88fa8cf4afda39709c295b",
@@ -137,7 +140,8 @@
         "description": "Zion Canyon National Park",
         "type": "Point",
         "coordinates": [-112.987418, 37.198125],
-        "day": 1
+        "day": 1,
+        "region": "Wathcman Campground"
       },
       {
         "_id": "5c88fa8cf4afda39709c2964",
@@ -183,7 +187,8 @@
         "description": "New York",
         "type": "Point",
         "coordinates": [-73.967696, 40.781821],
-        "day": 1
+        "day": 1,
+        "region": "The Great Lawn"
       },
       {
         "_id": "5c88fa8cf4afda39709c295f",
@@ -222,7 +227,8 @@
         "description": "Point Dume Beach",
         "type": "Point",
         "coordinates": [-118.809361, 34.003098],
-        "day": 1
+        "day": 1,
+        "region": "Point Dume"
       },
       {
         "_id": "5c88fa8cf4afda39709c296a",
@@ -275,7 +281,8 @@
         "description": "Natural Bridges National Monument",
         "type": "Point",
         "coordinates": [-109.99953, 37.629017],
-        "day": 1
+        "day": 1,
+        "region": "Sipapu Bridge"
       },
       {
         "_id": "5c88fa8cf4afda39709c2972",
@@ -314,7 +321,8 @@
         "description": "Yellowknife",
         "type": "Point",
         "coordinates": [-114.406097, 62.439943],
-        "day": 1
+        "day": 1,
+        "region": "Borealis Park"
       }
     ]
   },
@@ -339,7 +347,8 @@
         "description": "Beringer Vineyards",
         "type": "Point",
         "coordinates": [-122.479887, 38.510312],
-        "day": 1
+        "day": 1,
+        "region": "Beringer Vineyards"
       },
       {
         "_id": "5c88fa8cf4afda39709c296e",

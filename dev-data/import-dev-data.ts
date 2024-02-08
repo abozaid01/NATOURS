@@ -14,7 +14,7 @@ const reviewsData = JSON.parse(readFileSync(`${__dirname}/data/reviews.json`, 'u
       dbName: process.env.DB_NAME,
     });
     await Tour.deleteMany();
-    await Tour.insertMany(toursData);
+    await Tour.create(toursData);
 
     await Review.deleteMany();
     await Review.insertMany(reviewsData);
