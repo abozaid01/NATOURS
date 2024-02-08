@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import * as usersController from '../controllers/user.controllers';
 import * as authController from '../controllers/auth.controllers';
+import { uploadPhoto, resizeUserPhoto } from '../middlewares/upload.middleware';
 
 const router = Router();
 
 router.route('/signup').post(authController.signup);
 router.route('/login').post(authController.login);
+router.route('/logout').get(authController.logout);
 
 router.route('/forget-password').post(authController.forgetPassword);
 router.route('/reset-password/:token').patch(authController.resetPassword);
@@ -17,7 +19,7 @@ router.use(authController.authenticate);
 router
   .route('/me')
   .get(usersController.getMe, usersController.getUser)
-  .patch(usersController.updateMe)
+  .patch(uploadPhoto, resizeUserPhoto, usersController.updateMe)
   .delete(usersController.deleteMe);
 
 router.use(authController.authorize('admin'));

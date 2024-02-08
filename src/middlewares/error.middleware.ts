@@ -2,32 +2,58 @@ import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/AppError';
 import { logger } from '../utils/logger';
 
-const sendErrorDev = (err: AppError, res: Response) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    err: err,
-    stack: err.stack,
-  });
-};
-
-const sendErrorProd = (err: AppError, res: Response) => {
-  // Opertional, trusted Errors : send to client
-  if (err.isOpertional)
+const sendErrorDev = (err: AppError, req: Request, res: Response) => {
+  // API
+  if (req.originalUrl.startsWith('/api')) {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
+      err: err,
+      stack: err.stack,
     });
-  // Programming or other Unkown Errors (e.g, 3rd parties packages): Don't leak error details
-  else {
-    // 1) log the error
-    logger?.error(err);
+  } else {
+    // RENDERD Page
+    res.status(err.statusCode).render('error', { title: 'Something went wrong', msg: err.message });
+  }
+};
 
-    // 2) send generic error
-    res.status(500).json({
-      status: 'error',
-      message: 'somthing went wrog!',
-    });
+const sendErrorProd = (err: AppError, req: Request, res: Response) => {
+  // 1) API
+  if (req.originalUrl.startsWith('/api')) {
+    // 1.1) Opertional, trusted Errors : send to client
+    if (err.isOpertional)
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    // 1.2) Programming or other Unkown Errors (e.g, 3rd parties packages): Don't leak error details
+    else {
+      // 1.2.1) log the error
+      logger?.error(err);
+
+      // 1.2.2) send generic error
+      res.status(500).json({
+        status: 'error',
+        message: 'somthing went wrog!',
+      });
+    }
+  }
+  // 2) RENDERD Page
+  else {
+    // 2.1) Opertional, trusted Errors : send to client
+    if (err.isOpertional)
+      res.status(err.statusCode).render('error', {
+        title: 'Something went wrong!',
+        msg: err.message,
+      });
+    else {
+      // 2.2) Programming or other Unkown Errors
+      logger?.error(err);
+      res.status(500).render('error', {
+        title: 'Something went wrong!',
+        msg: 'try again later',
+      });
+    }
   }
 };
 
@@ -38,7 +64,7 @@ const handleCastErrorDB = (err: AppError) => {
 
 const handleDuplicateKeysDB = (err: AppError) => {
   const message = `Duplicate key value: ${err.keyValue?.name}`;
-  return new AppError(message, 400);
+  return new AppError(message, 409); // Conflict
 };
 
 const handleValidationErrorDB = (err: AppError) => {
@@ -58,7 +84,7 @@ const handleErrors = function (err: AppError, req: Request, res: Response, next:
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    return sendErrorDev(err, res);
+    return sendErrorDev(err, req, res);
   }
 
   if (process.env.NODE_ENV === 'production') {
@@ -80,7 +106,7 @@ const handleErrors = function (err: AppError, req: Request, res: Response, next:
     // Handle Expired JWT Tokens
     if (err.name === 'TokenExpiredError') err = handleTokenExpiredError();
 
-    return sendErrorProd(err, res);
+    return sendErrorProd(err, req, res);
   }
 };
 

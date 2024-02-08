@@ -17,7 +17,7 @@ interface Tour {
   slug: string;
   secretTour: boolean;
   guides: mongoose.Schema.Types.ObjectId;
-  locations: { description: string; type: 'Point'; day: number; coordinates: number[] }[];
+  locations: { description: string; type: 'Point'; day: number; region?: string; coordinates: number[] }[];
 }
 
 export default Tour;

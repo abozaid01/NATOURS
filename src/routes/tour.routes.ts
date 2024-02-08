@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as toursController from '../controllers/tour.controllers';
 import * as authController from '../controllers/auth.controllers';
 import reviewRouter from './review.routes';
+import { resizeTourImages, uploadTourImgs } from '../middlewares/upload.middleware';
 
 const router = Router();
 
@@ -14,7 +15,13 @@ router
 router
   .route('/:id')
   .get(toursController.getTour)
-  .patch(authController.authenticate, authController.authorize('admin', 'lead-guide'), toursController.updateTour)
+  .patch(
+    authController.authenticate,
+    authController.authorize('admin', 'lead-guide'),
+    uploadTourImgs,
+    resizeTourImages,
+    toursController.updateTour,
+  )
   .delete(authController.authenticate, authController.authorize('admin', 'lead-guide'), toursController.deleteTour);
 
 router.route('/top-5').get(toursController.aliasTopTours, toursController.getTours);

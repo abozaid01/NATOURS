@@ -20,7 +20,7 @@ const createAndSendToken = (user: IUser, statusCode: number, res: Response) => {
 
   res.cookie('jwt', token, {
     expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
-    httpOnly: true,
+    httpOnly: true, // Means that we can't manuiplate the cookie in the browser in any way (NOT even destroy it (delete it))
     secure: process.env.NODE_ENV === 'production',
   });
 
@@ -41,7 +41,7 @@ export const signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
-    role: req.body.role,
+    // role: req.body.role,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
@@ -69,6 +69,7 @@ export const authenticate = catchAsync(async (req: Request, res, next) => {
   // 1) check if the token is exist
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer '))
     token = req.headers.authorization.split(' ')[1];
+  else if (req.cookies.jwt) token = req.cookies.jwt;
 
   if (!token)
     return next(
@@ -90,8 +91,43 @@ export const authenticate = catchAsync(async (req: Request, res, next) => {
 
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
+  res.locals.user = currentUser;
+
   next();
 });
+
+// Only for rendered pages, no errors!
+export const isLoggedIn = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (req.cookies.jwt) {
+      // 1) verify token
+      const decoded = await verifyAsync(req.cookies.jwt, process.env.JWT_SECRET as string);
+
+      // 2) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.passwordChangedAfter(decoded.iat as number)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
+      return next();
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
+export const logout = (req: Request, res: Response) => {
+  res.cookie('jwt', 'loggedout', { expires: new Date(Date.now() + 1 * 1000), httpOnly: true });
+  res.status(200).json({ status: 'success' });
+};
 
 export const authorize = (...roles: string[]) => {
   // roles ['admin', 'tour-guide', ...]

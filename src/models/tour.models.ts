@@ -104,6 +104,7 @@ const tourSchma = new Schema<ITour>(
         },
         description: String,
         day: Number,
+        region: String,
       },
     ],
   },
@@ -130,7 +131,7 @@ tourSchma.virtual<ITour>('reviews', {
 // NOTE: runs before .save() and create() but NOT insertMany(), findByIdAndUpdate(), ...
 tourSchma.pre('save', function (next) {
   // 'this' refers to the document
-  this.slug = this.name.toLocaleLowerCase();
+  this.slug = this.name.toLowerCase().split(' ').join('-');
   next();
 });
 
