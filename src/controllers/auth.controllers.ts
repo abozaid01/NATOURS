@@ -7,7 +7,7 @@ import IUser from '../interfaces/user.interface';
 import { catchAsync } from '../utils/catchAsync';
 import { verifyAsync } from '../utils/verifyJwtAsync';
 import { logger } from '../utils/logger';
-import { sendEmail } from '../utils/sendEmail';
+import Email from '../utils/Email';
 
 interface Request extends ExpressRequest {
   user?: IUser;
@@ -45,6 +45,9 @@ export const signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  const profileURL = `${req.protocol}://${req.get('host')}/me`;
+  await new Email(newUser, profileURL).sendWelcome();
 
   createAndSendToken(newUser, 201, res);
 });
@@ -155,14 +158,9 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
   const resetToken = await user.createPasswordResetToken();
 
   // 3) sent it back to user's email
-  const resetURL = `${req.protocol}://${req.hostname}/api/v1/users/reset-password/${resetToken}`;
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message,
-    });
+    const resetURL = `${req.protocol}://${req.hostname}/api/v1/users/reset-password/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
       status: 'success',
       message: 'Token sent to email!',
