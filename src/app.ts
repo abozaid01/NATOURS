@@ -3,6 +3,7 @@ import tourRouter from './routes/tour.routes';
 import userRouter from './routes/user.routes';
 import reviewRouter from './routes/review.routes';
 import viewsRouter from './routes/view.routes';
+import bookingRouter from './routes/booking.routes';
 import AppError from './utils/AppError';
 import handleErrors from './middlewares/error.middleware';
 import httpLoggerMiddleware from './middlewares/logger.middleware';
@@ -12,6 +13,8 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { webhookCheckout } from './controllers/booking.controllers';
 
 const app = express();
 
@@ -21,6 +24,7 @@ app.set('view engine', 'pug');
 app.set('views', `${__dirname}/views`);
 
 // Middlewares
+app.use(cors());
 // Use Helmet middleware to Set security HTTP headers and configure CSP
 app.use(helmet());
 const scriptSrcUrls = ['https://api.tiles.mapbox.com/', 'https://api.mapbox.com/'];
@@ -43,6 +47,7 @@ app.use(
       objectSrc: [],
       imgSrc: ["'self'", 'blob:', 'data:'],
       fontSrc: ["'self'", "'unsafe-inline'", ...fontSrcUrls],
+      formAction: ["'self'", '*'],
     },
   }),
 );
@@ -54,6 +59,8 @@ const limiter = rateLimit({
   message: 'Too many Requests from this IP, please try again in an hour!',
 });
 app.use(limiter);
+
+app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
@@ -80,6 +87,7 @@ app.use('/', viewsRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 //404 Not-Found Routes
 app.all('*', (req, res, next) => {

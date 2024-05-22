@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import Tour from '../models/tour.models';
 import AppError from '../utils/AppError';
+import Booking from '../models/booking.models';
 
 class ViewsController {
   static getOverview = catchAsync(async (req: Request, res: Response) => {
@@ -29,6 +30,17 @@ class ViewsController {
       title: 'Your account',
     });
   };
+
+  static getMyTours = catchAsync(async (req: Request, res: Response) => {
+    const bookings = await Booking.find({ user_id: req.user!.id });
+    const tourIds = bookings.map((el) => el.tour_id);
+    const tours = await Tour.find({ _id: { $in: tourIds } });
+
+    res.status(200).render('overview', {
+      title: 'Your account',
+      tours,
+    });
+  });
 }
 
 export default ViewsController;

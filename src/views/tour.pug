@@ -3,6 +3,7 @@ extends base
 block append head
   link(href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet')
   script(src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js')
+  //- script(src=" https://js.stripe.com/v3/") 
 
 block content 
   section.section-header
@@ -74,7 +75,8 @@ block content
         p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
 
         if user
-          button.btn.btn--green.span-all-rows Book tour now!
+          form(action=`/api/v1/bookings/checkout-session/${tour.id}`, method="get") 
+            button(type="submit").btn.btn--green.span-all-rows Book tour now!
         else
           a.btn.btn--green.span-all-rows(href="/login") Login to book tour
 

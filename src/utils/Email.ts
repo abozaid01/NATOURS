@@ -4,8 +4,8 @@ import pug from 'pug';
 import { htmlToText } from 'html-to-text';
 
 /*
-@usage  new Email(user).sendWelcome()
-        new Email(user).sendPasswordReset()
+@usage  new Email(user, Call to Action URL).sendWelcome()
+        new Email(user, url).sendPasswordReset()
 
 */
 class Email {
